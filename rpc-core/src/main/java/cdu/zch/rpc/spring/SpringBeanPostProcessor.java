@@ -43,7 +43,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
             log.info("[{}] is annotated with [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());;
             // 得到RpcService
             RpcService rpcService = bean.getClass().getAnnotation(RpcService.class);
-            // 构建R赔偿ServiceConfig对象
+            // 构建RpcServiceConfig对象
             RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
                     .group(rpcService.group())
                     .version(rpcService.version())

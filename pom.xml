@@ -29,7 +29,7 @@
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <junit.platform.version>1.5.2</junit.platform.version>
 
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <protostuff.version>1.7.2</protostuff.version>
         <hessian.version>4.0.65</hessian.version>
 
@@ -73,6 +73,12 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
