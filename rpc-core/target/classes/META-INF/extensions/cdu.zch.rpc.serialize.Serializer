@@ -1,0 +1,3 @@
+kryo=cdu.zch.rpc.serialize.kryo.KryoSerializer
+protostuff=cdu.zch.rpc.serialize.protostuff.ProtostuffSerializer
+hessian=cdu.zch.rpc.serialize.hessian.HessianSerializer

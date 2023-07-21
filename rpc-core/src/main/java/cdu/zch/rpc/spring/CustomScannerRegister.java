@@ -32,7 +32,8 @@ public class CustomScannerRegister implements ImportBeanDefinitionRegistrar, Res
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
         AnnotationAttributes rpcScanAnnotationAttributes = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(RpcScan.class.getName()));
         String[] rpcScanBasePackages = new String[0];
-        if (rpcScanBasePackages != null) {
+        if (rpcScanAnnotationAttributes != null) {
+            // 得到basePackage的值
             rpcScanBasePackages = rpcScanAnnotationAttributes.getStringArray(BASE_PACKAGE_ATTRIBUTE_NAME);
         }
         if (rpcScanBasePackages.length == 0) {

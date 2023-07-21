@@ -30,8 +30,7 @@ public final class PropertiesFileUtil {
         }
         Properties properties = null;
         try (InputStreamReader inputStreamReader = new InputStreamReader(
-
-                Files.newInputStream(Paths.get(rpcConfigPath)), StandardCharsets.UTF_8)) {
+                new FileInputStream(rpcConfigPath), StandardCharsets.UTF_8)) {
             properties = new Properties();
             properties.load(inputStreamReader);
         } catch (IOException e) {
