@@ -15,13 +15,11 @@ public @interface RpcReference {
 
     /**
      * 服务版本号
-     * @return
      */
     String version() default "";
 
     /**
      * 服务组
-     * @return
      */
     String group() default "";
 
