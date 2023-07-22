@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
  * @date 2023/7/20
  **/
 public class CustomScanner extends ClassPathBeanDefinitionScanner {
+
     public CustomScanner(BeanDefinitionRegistry registry, Class<? extends Annotation> annoType) {
         super(registry);
         super.addIncludeFilter(new AnnotationTypeFilter(annoType));

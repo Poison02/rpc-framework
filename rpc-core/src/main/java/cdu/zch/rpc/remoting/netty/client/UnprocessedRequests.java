@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2023/7/21
  **/
 public class UnprocessedRequests {
-
     private static final Map<String, CompletableFuture<RpcResponse<Object>>> UNPROCESSED_RESPONSE_FUTURES = new ConcurrentHashMap<>();
 
     public void put(String requestId, CompletableFuture<RpcResponse<Object>> future) {
@@ -21,11 +20,10 @@ public class UnprocessedRequests {
 
     public void complete(RpcResponse<Object> rpcResponse) {
         CompletableFuture<RpcResponse<Object>> future = UNPROCESSED_RESPONSE_FUTURES.remove(rpcResponse.getRequestId());
-        if (future != null) {
+        if (null != future) {
             future.complete(rpcResponse);
         } else {
             throw new IllegalStateException();
         }
     }
-
 }

@@ -25,7 +25,6 @@ import java.net.InetSocketAddress;
 public class RpcClientHandler extends ChannelInboundHandlerAdapter {
 
     private final UnprocessedRequests unprocessedRequests;
-
     private final NettyClient nettyClient;
 
     public RpcClientHandler() {
@@ -34,10 +33,10 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * 读取从服务器发来的消息
+     * Read the message transmitted by the server
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             log.info("client receive msg: [{}]", msg);
             if (msg instanceof RpcMessage) {
@@ -47,7 +46,6 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
                     log.info("heart [{}]", tmp.getData());
                 } else if (messageType == RpcConstants.RESPONSE_TYPE) {
                     RpcResponse<Object> rpcResponse = (RpcResponse<Object>) tmp.getData();
-                    // 客户端完成此次请求即可
                     unprocessedRequests.complete(rpcResponse);
                 }
             }
@@ -75,8 +73,11 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     * Called when an exception occurs in processing a client message
+     */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("client catch exception：", cause);
         cause.printStackTrace();
         ctx.close();

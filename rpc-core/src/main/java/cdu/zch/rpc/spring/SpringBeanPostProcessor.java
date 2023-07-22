@@ -28,27 +28,25 @@ import java.lang.reflect.Field;
 public class SpringBeanPostProcessor implements BeanPostProcessor {
 
     private final ServiceProvider serviceProvider;
-
-    private final RpcRequestTransport rpcRequestTransport;
+    private final RpcRequestTransport rpcClient;
 
     public SpringBeanPostProcessor() {
         this.serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
-        this.rpcRequestTransport = ExtensionLoader.getExtensionLoader(RpcRequestTransport.class).getExtension(RpcRequestTransportEnum.NETTY.getName());
+        this.rpcClient = ExtensionLoader.getExtensionLoader(RpcRequestTransport.class).getExtension(RpcRequestTransportEnum.NETTY.getName());
     }
 
     @SneakyThrows
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (bean.getClass().isAnnotationPresent(RpcService.class)) {
-            log.info("[{}] is annotated with [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());;
-            // 得到RpcService
+            log.info("[{}] is annotated with  [{}]", bean.getClass().getName(), RpcService.class.getCanonicalName());
+            // get RpcService annotation
             RpcService rpcService = bean.getClass().getAnnotation(RpcService.class);
-            // 构建RpcServiceConfig对象
+            // build RpcServiceProperties
             RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
                     .group(rpcService.group())
                     .version(rpcService.version())
-                    .service(bean)
-                    .build();
+                    .service(bean).build();
             serviceProvider.publishService(rpcServiceConfig);
         }
         return bean;
@@ -63,9 +61,8 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
             if (rpcReference != null) {
                 RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
                         .group(rpcReference.group())
-                        .version(rpcReference.version())
-                        .build();
-                RpcClientProxy rpcClientProxy = new RpcClientProxy(rpcRequestTransport, rpcServiceConfig);
+                        .version(rpcReference.version()).build();
+                RpcClientProxy rpcClientProxy = new RpcClientProxy(rpcClient, rpcServiceConfig);
                 Object clientProxy = rpcClientProxy.getProxy(declaredField.getType());
                 declaredField.setAccessible(true);
                 try {
@@ -74,6 +71,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                     e.printStackTrace();
                 }
             }
+
         }
         return bean;
     }

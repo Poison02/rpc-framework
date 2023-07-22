@@ -78,8 +78,6 @@ public class RpcClientProxy implements InvocationHandler {
                     (CompletableFuture<RpcResponse<Object>>) rpcRequestTransport.sendRpcRequest(rpcRequest);
             rpcResponse = completableFuture.get();
         }
-        System.out.println(rpcRequest);
-        System.out.println(rpcResponse);
         this.check(rpcResponse, rpcRequest);
 
         return rpcResponse.getData();

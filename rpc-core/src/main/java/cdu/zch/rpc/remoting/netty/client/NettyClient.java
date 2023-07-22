@@ -95,7 +95,6 @@ public class NettyClient implements RpcRequestTransport {
         CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
         // 服务发现
         InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest);
-        System.out.println(inetSocketAddress);
         // 获取和服务端连接的channel
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
@@ -118,6 +117,8 @@ public class NettyClient implements RpcRequestTransport {
                     log.error("Send msg failed:", future.cause());
                 }
             });
+        } else {
+            throw new IllegalStateException();
         }
         return resultFuture;
     }
