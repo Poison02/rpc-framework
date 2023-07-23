@@ -2,6 +2,7 @@ package cdu.zch.rpc.loadbalance;
 
 import cdu.zch.rpc.extension.SPI;
 import cdu.zch.rpc.remoting.dto.RpcRequest;
+import com.alibaba.nacos.api.naming.pojo.Instance;
 
 import java.util.List;
 

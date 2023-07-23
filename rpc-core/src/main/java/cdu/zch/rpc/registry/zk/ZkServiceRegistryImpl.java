@@ -13,7 +13,8 @@ import java.net.InetSocketAddress;
  * @date 2023/7/21
  **/
 @Slf4j
-public class ZkServiceRegistryImpl implements ServiceRegistry {
+public class
+ZkServiceRegistryImpl implements ServiceRegistry {
     @Override
     public void registerService(String rpcServiceName, InetSocketAddress inetSocketAddress) {
         String servicePath = CuratorUtil.ZK_REGISTER_ROOT_PATH + "/" + rpcServiceName + inetSocketAddress.toString();

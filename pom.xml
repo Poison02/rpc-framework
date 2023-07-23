@@ -34,6 +34,8 @@
         <hessian.version>4.0.65</hessian.version>
 
         <lombok.version>1.18.28</lombok.version>
+
+        <nacos-client.version>2.2.1</nacos-client.version>
     </properties>
 
     <dependencyManagement>
@@ -110,6 +112,11 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos-client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

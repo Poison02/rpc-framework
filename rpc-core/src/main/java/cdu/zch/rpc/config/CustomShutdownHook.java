@@ -2,6 +2,7 @@ package cdu.zch.rpc.config;
 
 import cdu.zch.rpc.registry.zk.util.CuratorUtil;
 import cdu.zch.rpc.remoting.netty.server.NettyServer;
+import cdu.zch.rpc.utils.NacosUtil;
 import cdu.zch.rpc.utils.threadpool.ThreadPoolFactoryUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,8 @@ public class CustomShutdownHook {
             try {
                 InetSocketAddress inetSocketAddress = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), NettyServer.PORT);
                 CuratorUtil.clearRegistry(CuratorUtil.getZkClient(), inetSocketAddress);
+
+                NacosUtil.clearRegistry();
             } catch (UnknownHostException ignored) {
 
             }

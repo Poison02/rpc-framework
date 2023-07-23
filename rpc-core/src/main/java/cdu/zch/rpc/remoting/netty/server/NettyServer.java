@@ -5,6 +5,7 @@ import cdu.zch.rpc.config.RpcServiceConfig;
 import cdu.zch.rpc.factory.SingletonFactory;
 import cdu.zch.rpc.provider.ServiceProvider;
 import cdu.zch.rpc.provider.impl.ZkServiceProviderImpl;
+import cdu.zch.rpc.registry.nacos.NacosServiceRegistryImpl;
 import cdu.zch.rpc.remoting.dto.RpcMessage;
 import cdu.zch.rpc.remoting.netty.codec.RpcMessageDecoder;
 import cdu.zch.rpc.remoting.netty.codec.RpcMessageEncoder;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,6 +41,8 @@ public class NettyServer {
 
     public void registerService(RpcServiceConfig rpcServiceConfig) {
         serviceProvider.publishService(rpcServiceConfig);
+        /*NacosServiceRegistryImpl nacosServiceRegistry = new NacosServiceRegistryImpl();
+        nacosServiceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress("127.0.0.1", 9998));*/
     }
 
     @SneakyThrows

@@ -14,6 +14,6 @@ public class HelloController {
 
     public void test() throws InterruptedException {
         String hello = this.helloService.hello(new Hello("111", "222"));
-
+        System.out.println("调用结果是： " + hello);
     }
 }

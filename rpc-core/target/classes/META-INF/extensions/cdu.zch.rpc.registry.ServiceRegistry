@@ -1,1 +1,2 @@
 zk=cdu.zch.rpc.registry.zk.ZkServiceRegistryImpl
+nacos=cdu.zch.rpc.registry.nacos.NacosServiceRegistryImpl

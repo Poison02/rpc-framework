@@ -37,12 +37,12 @@ rpc-framework
 ## 项目运行
 1. 下载Zookeeper，官网下载：[下载地址](https://zookeeper.apache.org/releases.html)，下载解压在bin目录下的`zkServer.md`，双击运行即可，本项目使用**3.7.1版本**，尽量一致避免出现问题。 
 2. 找到项目中的**demo-rpc-server**模块，运行**Server**
-![server](./assets/run-server.png)
+  ![server](./assets/run-server.png)
 3. 找到项目中的**demo-rpc-client**模块，运行**NettyClientMain**
-![client](./assets/run-client.png)
+  ![client](./assets/run-client.png)
 4. 运行成功后可看到：
-![console-server](./assets/console-server.png)
-![console-client](./assets/console-client.png)
+  ![console-server](./assets/console-server.png)
+  ![console-client](./assets/console-client.png)
 ---
 
 本项目只作为自己的学习项目，本人也在学习中，该项目参考的是别人的开源项目，大佬写的非常棒，目前处于学习中，后期会不断优化的。
