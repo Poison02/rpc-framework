@@ -24,8 +24,10 @@ public final class SingletonFactory {
         if (OBJECT_MAP.containsKey(key)) {
             return c.cast(OBJECT_MAP.get(key));
         } else {
+            // "computeIfAbsent"方法将新实例使用键放入"OBJECT_MAP"，并返回该实例。
             return c.cast(OBJECT_MAP.computeIfAbsent(key, k -> {
                 try {
+                    // 使用反射创建该类的新实例
                     return c.getDeclaredConstructor().newInstance();
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e.getMessage(), e);

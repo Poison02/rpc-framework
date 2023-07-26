@@ -4,8 +4,8 @@ import cdu.zch.rpc.annotation.RpcScan;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
- * @author shuang.kou
- * @createTime 2020年05月10日 07:25:00
+ * @author Zch
+ * @date 2023/7/21
  */
 @RpcScan(basePackage = {"cdu.zch.rpc"})
 public class NettyClientMain {

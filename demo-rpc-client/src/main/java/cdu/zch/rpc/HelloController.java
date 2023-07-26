@@ -4,7 +4,8 @@ import cdu.zch.rpc.annotation.RpcReference;
 import org.springframework.stereotype.Component;
 
 /**
- * @author smile2coder
+ * @author Zch
+ * @date 2023/7/21
  */
 @Component
 public class HelloController {
