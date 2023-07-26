@@ -92,6 +92,41 @@ public class RpcRequest implements Serializable {
 1. 通过`SPI`机制对项目进行解耦，提高了项目的可扩展性；
 2. 在服务端采用多线程的方式进行事件的并发处理，优雅地处理各种事件。
 ---
+## 项目中使用到的设计模式
+1. **单例模式**，并且使用单例工厂创建示例，这个工厂本身也是单例的；
+```java
+public final class SingletonFactory {
+
+    private static final Map<String, Object> OBJECT_MAP = new ConcurrentHashMap<>();
+
+    private SingletonFactory() {
+    }
+
+    public static <T> T getInstance(Class<T> c) {
+        if (c == null) {
+            throw new IllegalArgumentException();
+        }
+        String key = c.toString();
+        if (OBJECT_MAP.containsKey(key)) {
+            return c.cast(OBJECT_MAP.get(key));
+        } else {
+            // "computeIfAbsent"方法将新实例使用键放入"OBJECT_MAP"，并返回该实例。
+            return c.cast(OBJECT_MAP.computeIfAbsent(key, k -> {
+                try {
+                    // 使用反射创建该类的新实例
+                    return c.getDeclaredConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }));
+        }
+    }
+
+}
+```
+2. **抽象工厂模式**，在使用负载均衡的时候，考虑到负载均衡只有一个作用，因此抽象出来为一个接口，并使用一个抽象类实现接口，后续的负载均衡策略只需要实现这个抽象类即可
+    
+    ![abstract-factory](./assets/abstract-factory.png)
 ## 项目运行
 1. 下载Zookeeper，官网下载：[下载地址](https://zookeeper.apache.org/releases.html)，下载解压在bin目录下的`zkServer.md`，双击运行即可，本项目使用**3.7.1版本**，尽量一致避免出现问题。 
 

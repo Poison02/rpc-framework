@@ -11,7 +11,8 @@ import lombok.Getter;
 @Getter
 public enum ServiceRegistryEnum {
 
-    ZK("zk");
+    ZK("zk"),
+    NACOS("nacos");
 
     private final String name;
 

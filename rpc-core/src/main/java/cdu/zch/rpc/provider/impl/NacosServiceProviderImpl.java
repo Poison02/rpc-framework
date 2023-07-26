@@ -19,23 +19,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Zch
- * @date 2023/7/21
+ * @date 2023/7/26
  **/
 @Slf4j
-public class ZkServiceProviderImpl implements ServiceProvider {
+public class NacosServiceProviderImpl implements ServiceProvider {
 
     /**
      * key: rpc service name(interface name + version + group)
      * value: service object
      */
     private final Map<String, Object> serviceMap;
+
     private final Set<String> registeredService;
+
     private final ServiceRegistry serviceRegistry;
 
-    public ZkServiceProviderImpl() {
-        serviceMap = new ConcurrentHashMap<>();
-        registeredService = ConcurrentHashMap.newKeySet();
-        serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension(ServiceRegistryEnum.ZK.getName());
+    public NacosServiceProviderImpl() {
+        this.serviceMap = new ConcurrentHashMap<>();
+        this.registeredService = ConcurrentHashMap.newKeySet();
+        this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension(ServiceRegistryEnum.NACOS.getName());
     }
 
     @Override
