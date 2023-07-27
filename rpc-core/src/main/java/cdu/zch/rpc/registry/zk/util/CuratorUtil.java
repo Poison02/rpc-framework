@@ -100,9 +100,12 @@ public class CuratorUtil {
         // 检查用户是否设置了zk地址
         Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
         String zookeeperAddress =
-                properties != null && properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue()) != null
+                properties != null
                         ? properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue())
                         : DEFAULT_ZOOKEEPER_ADDRESS;
+        if (zookeeperAddress == null) {
+            return null;
+        }
         // 如果zkClient已经启动，则直接返回
         if (zkClient != null && zkClient.getState() == CuratorFrameworkState.STARTED) {
             return zkClient;

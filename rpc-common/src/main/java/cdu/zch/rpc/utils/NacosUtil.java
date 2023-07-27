@@ -1,5 +1,6 @@
 package cdu.zch.rpc.utils;
 
+import cdu.zch.rpc.enums.RpcConfigEnum;
 import cdu.zch.rpc.enums.RpcErrorMessageEnum;
 import cdu.zch.rpc.exception.RpcException;
 import com.alibaba.nacos.api.exception.NacosException;
@@ -9,10 +10,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Nacos连接工具类
@@ -36,6 +34,15 @@ public class NacosUtil {
 
     public static NamingService getNacosNamingService() {
         try {
+            // 检查用户是否设置了nacos地址
+            Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
+            String nacosAddress =
+                    properties != null && properties.getProperty(RpcConfigEnum.NACOS_ADDRESS.getPropertyValue()) != null
+                            ? properties.getProperty(RpcConfigEnum.NACOS_ADDRESS.getPropertyValue())
+                            : SERVER_ADDR;
+            if (nacosAddress == null) {
+                return null;
+            }
             return NamingFactory.createNamingService(SERVER_ADDR);
         } catch (Exception e) {
             log.error("连接到Nacos时有错误发生！", e);

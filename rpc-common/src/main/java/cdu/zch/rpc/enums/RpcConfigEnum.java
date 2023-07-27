@@ -12,7 +12,8 @@ import lombok.Getter;
 public enum RpcConfigEnum {
 
     RPC_CONFIG_PATH("rpc.properties"),
-    ZK_ADDRESS("rpc.zookeeper.address");
+    ZK_ADDRESS("rpc.zookeeper.address"),
+    NACOS_ADDRESS("rpc.nacos.address");
 
     private final String propertyValue;
 

@@ -39,7 +39,7 @@ public class NettyServer {
 
     public static final int PORT = 9998;
     private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
-    // private final ServiceProvider serviceProvider = SingletonFactory.getInstance(NacosServiceProviderImpl.class);
+    //private final ServiceProvider serviceProvider = SingletonFactory.getInstance(NacosServiceProviderImpl.class);
 
     public void registerService(RpcServiceConfig rpcServiceConfig) {
         serviceProvider.publishService(rpcServiceConfig);
