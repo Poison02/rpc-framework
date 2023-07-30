@@ -43,8 +43,6 @@ public class NettyServer {
 
     public void registerService(RpcServiceConfig rpcServiceConfig) {
         serviceProvider.publishService(rpcServiceConfig);
-        /*NacosServiceRegistryImpl nacosServiceRegistry = new NacosServiceRegistryImpl();
-        nacosServiceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), new InetSocketAddress("127.0.0.1", 9998));*/
     }
 
     @SneakyThrows
