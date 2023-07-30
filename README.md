@@ -1,5 +1,7 @@
 # rpc-framework
-使用Netty、Zookeeper、Spring等框架手写的一个简单RPC框架，仅用于个人学习！
+使用Netty、Zookeeper、Spring等框架手写的一个简单RPC框架，仅用于个人学习！</br>
+目前项目还在迭代中...代码中还有多处耦合的地方，待完善！</br>
+`dev`分支是开发分支，`main`分支是默认的完整分支。
 
 ## 项目的整体架构
 ![rpc-structure](./assets/rpc-structure-2.png)
@@ -7,7 +9,7 @@
 ---
 客户端与服务端进行通信
 - 代理层，主要作用是让远程调用像本地调用一样方便，由代理层去进行通信，主要用`JDK`的动态代理实现；
-- 注册中心层，当服务端节点增多时，单纯的使用`ip + port`调用服务就显得很冗余，这时候注册中心就是很好的解决方案，使用`Zookeeper`实现；
+- 注册中心层，当服务端节点增多时，单纯的使用`ip + port`调用服务就显得很冗余，这时候注册中心就是很好的解决方案，使用`Zookeeper`或者是`Nacos`实现；
 - 协议层，服务间通信网络传输非常重要，通信方式使用`Netty`的`NIO`通信，协议使用自定义协议，序列化使用`Hessian`、`Kryo`、`Protostuff`；
 - 负载均衡层，节点变多后，需要一种策略来帮助我们知道调用哪一个节点，本项目目前支持的算法策略有`随机`、`轮询`、`LFU`、`LRU`、`一致性哈希`，默认是`一致性哈希`；
 - ......
@@ -78,7 +80,7 @@ public class RpcRequest implements Serializable {
 }
 ```
 2. 代理层的设计，本项目采用的是JDK的动态代理，也是最常用的代理方式
-3. 注册中心层的设计，本项目采用的Zookeeper作为注册中心，后面会加上Nacos
+3. 注册中心层的设计，本项目采用Zookeeper和Nacos两种注册中心，默认是Zookeeper
 4. 服务端多线程设计，由于Netty是基于NIO的异步设计的，所以服务端处理连接和IO的线程都不应该是同一个，因此服务端大量采用了CompletableFuture异步处理，非常优雅
 ---
 ## 项目可优化的点
@@ -86,11 +88,20 @@ public class RpcRequest implements Serializable {
 2. 不管是注册中心、序列化方式、压缩方式，都应该以配置文件的方式进行解耦，要给用户可选择的余地，本项目未使用配置的方式；
 3. 增加容错层，项目运行中可能会有服务中断的现象，这时候就需要使用容错层对服务进行排查；
 4. 增加链路追踪层，对项目运行流程进行追踪；
-5. ......
+5. 路由选址
+6. 监控
+7. 扩展优化
+8. ......
 ---
 ## 项目亮点
 1. 通过`SPI`机制对项目进行解耦，提高了项目的可扩展性；
 2. 在服务端采用多线程的方式进行事件的并发处理，优雅地处理各种事件。
+3. 在项目中穿插了部分设计模式，提高了代码的复用性和可读性。
+4. 项目通过`Maven`进行模块化，提高了项目的可维护性。
+5. 通过配置文件的方式对扩展进行选择，增加了系统的可用性。
+5. ......
+---
+## 项目不足
 ---
 ## 项目中使用到的设计模式
 1. **单例模式**，并且使用单例工厂创建示例，这个工厂本身也是单例的；
@@ -127,7 +138,7 @@ public final class SingletonFactory {
 2. **抽象工厂模式**，在使用负载均衡的时候，考虑到负载均衡只有一个作用，因此抽象出来为一个接口，并使用一个抽象类实现接口，后续的负载均衡策略只需要实现这个抽象类即可
     
     ![abstract-factory](./assets/abstract-factory.png)
-## 项目运行
+## 项目默认运行
 1. 下载Zookeeper，官网下载：[下载地址](https://zookeeper.apache.org/releases.html)，下载解压在bin目录下的`zkServer.md`，双击运行即可，本项目使用**3.7.1版本**，尽量一致避免出现问题。 
 
 2. 找到项目中的**demo-rpc-server**模块，运行**Server**
@@ -143,4 +154,20 @@ public final class SingletonFactory {
     ![console-client](./assets/console-client.png)
 ---
 
+## 【慎用！】项目更改配置中心运行
+本项目使用了zookeeper和nacos作为配置中心，运行项目的时候只需要选择其中一种就行了，默认是zookeeper。
+- 第一步
+找到项目的demo-rpc-server和demo-rpc-client两个模块，分别修改其中的rpc.properties文件中的配置：
+```properties
+# rpc.zookeeper.address=127.0.0.1:2181
+rpc.nacos.address=127.0.0.1:8848
+```
+- 第二步，修改rpc-core中的客户端和服务端的实现</br>
+找到`rpc-core/src/main/java/cdu/zch/rpc/remoting/netty/client/NettyClient.java`的第68和69行，**注释掉68，放开69**.</br>
+找到`rpc-core/src/main/java/cdu/zch/rpc/remoting/netty/server/NettyServer.java`的第41和42行，**注释掉41，放开42**.
+
+- 第三步，启动项目
+启动zookeeper或者nacos，然后运行项目即可。
+
+## 项目更改负载均衡运行
 本项目只作为自己的学习项目，本人也在学习中，该项目参考的是别人的开源项目，大佬写的非常棒，目前处于学习中，后期会不断优化的。
