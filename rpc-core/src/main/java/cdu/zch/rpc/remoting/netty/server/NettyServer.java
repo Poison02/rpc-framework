@@ -2,6 +2,7 @@ package cdu.zch.rpc.remoting.netty.server;
 
 import cdu.zch.rpc.config.CustomShutdownHook;
 import cdu.zch.rpc.config.RpcServiceConfig;
+import cdu.zch.rpc.enums.RpcConfigEnum;
 import cdu.zch.rpc.factory.SingletonFactory;
 import cdu.zch.rpc.provider.ServiceProvider;
 import cdu.zch.rpc.provider.impl.NacosServiceProviderImpl;
@@ -10,6 +11,7 @@ import cdu.zch.rpc.registry.nacos.NacosServiceRegistryImpl;
 import cdu.zch.rpc.remoting.dto.RpcMessage;
 import cdu.zch.rpc.remoting.netty.codec.RpcMessageDecoder;
 import cdu.zch.rpc.remoting.netty.codec.RpcMessageEncoder;
+import cdu.zch.rpc.utils.PropertiesFileUtil;
 import cdu.zch.rpc.utils.RuntimeUtil;
 import cdu.zch.rpc.utils.threadpool.ThreadPoolFactoryUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,7 +41,15 @@ import java.util.concurrent.TimeUnit;
 public class NettyServer {
 
     public static final int PORT = 9998;
-    private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
+    private static final Properties PROPERTIES = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
+
+    // 通过配置文件判断注册中心是 zookeeper 还是 nacos
+    private final ServiceProvider serviceProvider =
+            PROPERTIES != null
+            && PROPERTIES.getProperty(RpcConfigEnum.NACOS_ADDRESS.getPropertyValue()) != null
+                    ? SingletonFactory.getInstance(NacosServiceProviderImpl.class)
+                    : SingletonFactory.getInstance(ZkServiceProviderImpl.class);
+    // private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
     //private final ServiceProvider serviceProvider = SingletonFactory.getInstance(NacosServiceProviderImpl.class);
 
     public void registerService(RpcServiceConfig rpcServiceConfig) {

@@ -154,7 +154,7 @@ public final class SingletonFactory {
     ![console-client](./assets/console-client.png)
 ---
 
-## 【慎用！】项目更改配置中心运行
+## 项目更改配置中心运行
 本项目使用了zookeeper和nacos作为配置中心，运行项目的时候只需要选择其中一种就行了，默认是zookeeper。
 - 第一步
 找到项目的demo-rpc-server和demo-rpc-client两个模块，分别修改其中的rpc.properties文件中的配置：
@@ -162,12 +162,14 @@ public final class SingletonFactory {
 # rpc.zookeeper.address=127.0.0.1:2181
 rpc.nacos.address=127.0.0.1:8848
 ```
-- 第二步，修改rpc-core中的客户端和服务端的实现</br>
-找到`rpc-core/src/main/java/cdu/zch/rpc/remoting/netty/client/NettyClient.java`的第68和69行，**注释掉68，放开69**.</br>
-找到`rpc-core/src/main/java/cdu/zch/rpc/remoting/netty/server/NettyServer.java`的第41和42行，**注释掉41，放开42**.
-
-- 第三步，启动项目
+- 第二步，启动项目
 启动zookeeper或者nacos，然后运行项目即可。
+
+- Server端效果</br>
+![img.png](assets/nacos-server.png)
+- Client端效果</br>
+![img.png](assets/nacos-client.png)
+
 
 ## 项目更改负载均衡运行
 本项目只作为自己的学习项目，本人也在学习中，该项目参考的是别人的开源项目，大佬写的非常棒，目前处于学习中，后期会不断优化的。

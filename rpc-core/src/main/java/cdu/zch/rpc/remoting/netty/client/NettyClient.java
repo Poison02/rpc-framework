@@ -1,10 +1,13 @@
 package cdu.zch.rpc.remoting.netty.client;
 
 import cdu.zch.rpc.enums.CompressTypeEnum;
+import cdu.zch.rpc.enums.RpcConfigEnum;
 import cdu.zch.rpc.enums.SerializationTypeEnum;
 import cdu.zch.rpc.enums.ServiceDiscoveryEnum;
 import cdu.zch.rpc.extension.ExtensionLoader;
 import cdu.zch.rpc.factory.SingletonFactory;
+import cdu.zch.rpc.provider.impl.NacosServiceProviderImpl;
+import cdu.zch.rpc.provider.impl.ZkServiceProviderImpl;
 import cdu.zch.rpc.registry.ServiceDiscovery;
 import cdu.zch.rpc.remoting.constants.RpcConstants;
 import cdu.zch.rpc.remoting.dto.RpcMessage;
@@ -13,6 +16,7 @@ import cdu.zch.rpc.remoting.dto.RpcResponse;
 import cdu.zch.rpc.remoting.netty.RpcRequestTransport;
 import cdu.zch.rpc.remoting.netty.codec.RpcMessageDecoder;
 import cdu.zch.rpc.remoting.netty.codec.RpcMessageEncoder;
+import cdu.zch.rpc.utils.PropertiesFileUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -25,6 +29,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +49,9 @@ public class NettyClient implements RpcRequestTransport {
     private final Bootstrap bootstrap;
 
     private final EventLoopGroup eventLoopGroup;
+
+    private static final Properties PROPERTIES =
+            PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
 
     public NettyClient() {
         // 初始化资源
@@ -65,8 +73,16 @@ public class NettyClient implements RpcRequestTransport {
                         p.addLast(new RpcClientHandler());
                     }
                 });
-        this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.ZK.getName());
-        //this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.NACOS.getName());
+        // this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.ZK.getName());
+        // this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.NACOS.getName());
+        // 通过配置文件判断注册中心是 zookeeper 还是 nacos
+        this.serviceDiscovery =
+                PROPERTIES != null
+                        && PROPERTIES.getProperty(RpcConfigEnum.NACOS_ADDRESS.getPropertyValue()) != null
+                        ? ExtensionLoader.getExtensionLoader(ServiceDiscovery.class)
+                        .getExtension(ServiceDiscoveryEnum.NACOS.getName())
+                        : ExtensionLoader.getExtensionLoader(ServiceDiscovery.class)
+                        .getExtension(ServiceDiscoveryEnum.ZK.getName());
         this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
         this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
     }
