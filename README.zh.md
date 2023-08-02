@@ -1,4 +1,7 @@
+<div align="center">中文 | <a href='./README.zh.md'>英文</a></div>
+
 # rpc-framework
+
 使用Netty、Zookeeper、Spring等框架手写的一个简单RPC框架，仅用于个人学习！</br>
 目前项目还在迭代中...代码中还有多处耦合的地方，待完善！</br>
 `dev`分支是开发分支，`main`分支是默认的完整分支。

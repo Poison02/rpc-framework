@@ -1,4 +1,7 @@
+<div align="center"><a href='./README.zh.md'>中文</a> | 英文</div>
+
 # rpc-framework
+
 A simple RPC framework handwritten using Netty, Zookeeper, Spring and other frameworks, only for personal learning!</br>
 At present, the project is still in iteration... There are still many coupling places in the code, which need to be improved!</br>
 The `dev` branch is the development branch, and the `main` branch is the default full branch.
