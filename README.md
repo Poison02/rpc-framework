@@ -1,76 +1,76 @@
 # rpc-framework
-使用Netty、Zookeeper、Spring等框架手写的一个简单RPC框架，仅用于个人学习！</br>
-目前项目还在迭代中...代码中还有多处耦合的地方，待完善！</br>
-`dev`分支是开发分支，`main`分支是默认的完整分支。
+A simple RPC framework handwritten using Netty, Zookeeper, Spring and other frameworks, only for personal learning!</br>
+At present, the project is still in iteration... There are still many coupling places in the code, which need to be improved!</br>
+The `dev` branch is the development branch, and the `main` branch is the default full branch.
 
-## 项目的整体架构
+## project structure
 ![rpc-structure](./assets/rpc-structure-2.png)
 
 ---
-客户端与服务端进行通信
-- 代理层，主要作用是让远程调用像本地调用一样方便，由代理层去进行通信，主要用`JDK`的动态代理实现；
-- 注册中心层，当服务端节点增多时，单纯的使用`ip + port`调用服务就显得很冗余，这时候注册中心就是很好的解决方案，使用`Zookeeper`或者是`Nacos`实现；
-- 协议层，服务间通信网络传输非常重要，通信方式使用`Netty`的`NIO`通信，协议使用自定义协议，序列化使用`Hessian`、`Kryo`、`Protostuff`；
-- 负载均衡层，节点变多后，需要一种策略来帮助我们知道调用哪一个节点，本项目目前支持的算法策略有`随机`、`轮询`、`LFU`、`LRU`、`一致性哈希`，默认是`一致性哈希`；
+Client communicates with server
+- proxy layer, The main function of the proxy layer is to make remote calls as convenient as local calls, and the proxy layer communicates, mainly using the dynamic proxy of `JDK`;
+- registry layer, When the number of server nodes increases, simply using `ip + port` to call the service is very redundant. At this time, the registration center is a good solution, using `Zookeeper` or `Nacos` to achieve;
+- protocol layer, Inter-service communication network transmission is very important. The communication method uses `NIO` communication of `Netty`, the protocol uses a custom protocol, and the serialization uses `Hessian`, `Kryo`, `Protostuff`;
+- load balancing layer, After the number of nodes increases, a strategy is needed to help us know which node to call. The algorithm strategies currently supported by this project include `random`, `polling`, `LFU`, `LRU`, `consistent hashing`, The default is `consistent hashing`;
 - ......
 
 ---
-代码架构：
+Code structure:
 ```
 rpc-framework
-├─demo-rpc-client     客户端测试模块
-├─demo-rpc-server     服务端测试模块
-├─hello-service-api   api模块
-├─rpc-common          rpc公共模块
-└─rpc-core            rpc核心模块
+├─demo-rpc-client     Client Test Module
+├─demo-rpc-server     Server Test Module
+├─hello-service-api   api module
+├─rpc-common          rpc public module
+└─rpc-core            rpc core module
 ```
-## 项目核心
-1. 协议层的设计
+## project core
+1. Protocol layer design
 ```
-采用自定义协议，协议如下：
+Using a custom protocol, the protocol is as follows:
 
-0     1     2     3     4        5     6     7     8         9          10      11     12  13  14   15 16    -- 字节长度
+0     1     2     3     4        5     6     7     8         9          10      11     12  13  14   15 16    -- byte length
 +-----+-----+-----+-----+--------+----+----+----+------+-----------+-------+----- --+-----+-----+-------+
-|   magic   code        |version | full length         | messageType| codec|compress|    requestId      |    -- 请求头
+|   magic   code        |version | full length         | messageType| codec|compress|    requestId      |    -- request header
 +-----------------------+--------+---------------------+-----------+-----------+-----------+------------+
 |                                                                                                       |
-|                                         body                                                          |    -- 请求体
+|                                         body                                                          |    -- request body
 |                                                                                                       |
 |                                        ... ...                                                        |
 +-------------------------------------------------------------------------------------------------------+
-- magic code: 魔法数，通常使用4个字节表示，用来判断是否是有效数据包
-- version: 版本号，使用1个字节表示，可以支持协议的升级
-- full length: 请求体的长度，使用4个字节表示，表示请求体中消息的长度
-- massageType: 消息类型，使用1个字节表示，表示是哪种类型的消息，如请求、响应、心跳等
-- codec: 编码类型，使用1个字节表示，序列化算法类型，如Kryo、Hessian、Protostuff等
-- compress: 压缩类型，使用1个字节表示，压缩算法类型，如GZIP、LZ4等
-- requestId: 请求ID，使用4个字节表示，全双工通信的标志，唯一ID不能重复，提供异步能力
+- magic code: Magic number, usually represented by 4 bytes, used to determine whether it is a valid data packet
+- version: Version number, represented by 1 byte, can support protocol upgrade
+- full length: The length of the request body, represented by 4 bytes, indicates the length of the message in the request body
+- massageType: Message type, represented by 1 byte, which type of message it is, such as request, response, heartbeat, etc.
+- codec: Encoding type, represented by 1 byte, serialization algorithm type, such as Kryo, Hessian, Protostuff, etc.
+- compress: Compression type, represented by 1 byte, compression algorithm type, such as GZIP, LZ4, etc.
+- requestId: Request ID, represented by 4 bytes, a symbol of full-duplex communication, the unique ID cannot be repeated, and provides asynchronous capability
 ```
-对于每次调用服务的请求也有相应的封装
+There is also a corresponding package for each request to call the service
 ```java
 public class RpcRequest implements Serializable {
 
     private static final long serialVersionUID = 1905122041950251207L;
 
-    // 请求ID，使用UUID生成
+    // Request ID, generated using UUID
     private String requestId;
 
-    // 接口名
+    // interface name
     private String interfaceName;
 
-    // 方法名
+    // method name
     private String methodName;
 
-    // 参数列表
+    // parameter list
     private Object[] parameters;
 
-    // 参数类型列表
+    // List of parameter types
     private Class<?>[] paramTypes;
 
-    // 版本号
+    // version number
     private String version;
 
-    // 组名
+    // group name
     private String group;
 
     public String getRpcServiceName() {
@@ -79,32 +79,30 @@ public class RpcRequest implements Serializable {
 
 }
 ```
-2. 代理层的设计，本项目采用的是JDK的动态代理，也是最常用的代理方式
-3. 注册中心层的设计，本项目采用Zookeeper和Nacos两种注册中心，默认是Zookeeper
-4. 服务端多线程设计，由于Netty是基于NIO的异步设计的，所以服务端处理连接和IO的线程都不应该是同一个，因此服务端大量采用了CompletableFuture异步处理，非常优雅
+2. For the design of the proxy layer, this project uses the dynamic proxy of JDK, which is also the most commonly used proxy method.
+3. The design of the registration center layer, this project uses Zookeeper and Nacos two registration centers, the default is Zookeeper.
+4. The multiThreaded design of the server, because Netty is based on the asynchronous design of NIO, the thread for processing connection and IO on the server should not be the same, so the server uses a large number of CompletableFuture asynchronous processing, which is very elegant.
 ---
-## 项目可优化的点
-1. 在协议层的传输中，压缩方式应该可以选择多种，本项目暂时只用了`GZIP`压缩；
-2. 不管是注册中心、序列化方式、压缩方式，都应该以配置文件的方式进行解耦，要给用户可选择的余地，本项目未使用配置的方式；
-3. 增加容错层，项目运行中可能会有服务中断的现象，这时候就需要使用容错层对服务进行排查；
-4. 增加链路追踪层，对项目运行流程进行追踪；
-5. 路由选址
-6. 监控
-7. 扩展优化
+## Project can be optimized
+1. In the transmission of the protocol layer, there should be a variety of compression methods to choose from. This project only uses `GZIP` compression for the time being;
+2. Regardless of the serialization method or the compression method, it should be decoupled in the form of a configuration file. To give users a choice, this project does not use the configuration method;
+3. Add a fault-tolerant layer, and there may be service interruptions during project operation. At this time, it is necessary to use the fault-tolerant layer to check the service;
+4. Add a link tracking layer to track the project operation process;
+5. Routing
+6. monitor
+7. Extended optimization
 8. ......
 ---
-## 项目亮点
-1. 通过`SPI`机制对项目进行解耦，提高了项目的可扩展性；
-2. 在服务端采用多线程的方式进行事件的并发处理，优雅地处理各种事件。
-3. 在项目中穿插了部分设计模式，提高了代码的复用性和可读性。
-4. 项目通过`Maven`进行模块化，提高了项目的可维护性。
-5. 通过配置文件的方式对扩展进行选择，增加了系统的可用性。
+## Project Highlights
+1. The project is decoupled through the `SPI` mechanism, which improves the scalability of the project;
+2. On the server side, multi-threading is used to process events concurrently, and handle various events gracefully.
+3. Some design patterns are interspersed in the project to improve the reusability and readability of the code.
+4. The project is modularized through `Maven`, which improves the maintainability of the project.
+5. The expansion is selected through the configuration file, which increases the usability of the system.
 5. ......
 ---
-## 项目不足
----
-## 项目中使用到的设计模式
-1. **单例模式**，并且使用单例工厂创建示例，这个工厂本身也是单例的；
+## Design patterns used in the project
+1. **Singleton**, and create an example using a singleton factory, which is itself a singleton;
 ```java
 public final class SingletonFactory {
 
@@ -121,10 +119,8 @@ public final class SingletonFactory {
         if (OBJECT_MAP.containsKey(key)) {
             return c.cast(OBJECT_MAP.get(key));
         } else {
-            // "computeIfAbsent"方法将新实例使用键放入"OBJECT_MAP"，并返回该实例。
             return c.cast(OBJECT_MAP.computeIfAbsent(key, k -> {
                 try {
-                    // 使用反射创建该类的新实例
                     return c.getDeclaredConstructor().newInstance();
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e.getMessage(), e);
@@ -135,41 +131,30 @@ public final class SingletonFactory {
 
 }
 ```
-2. **抽象工厂模式**，在使用负载均衡的时候，考虑到负载均衡只有一个作用，因此抽象出来为一个接口，并使用一个抽象类实现接口，后续的负载均衡策略只需要实现这个抽象类即可
-    
-    ![abstract-factory](./assets/abstract-factory.png)
-## 项目默认运行
-1. 下载Zookeeper，官网下载：[下载地址](https://zookeeper.apache.org/releases.html)，下载解压在bin目录下的`zkServer.md`，双击运行即可，本项目使用**3.7.1版本**，尽量一致避免出现问题。 
-
-2. 找到项目中的**demo-rpc-server**模块，运行**Server**
-
-    ![server](./assets/run-server.png)
-
-3. 找到项目中的**demo-rpc-client**模块，运行**NettyClientMain**
-
-     ![client](./assets/run-client.png)
-
-4. 运行成功后可看到：
-    ![console-server](./assets/console-server.png)
-    ![console-client](./assets/console-client.png)
+2. **Abstract Factory**, when using load balancing, considering that load balancing has only one role, it is abstracted as an interface, and an abstract class is used to implement the interface. Subsequent load balancing strategies only need to implement this abstract class.</br>
+![abstract-factory](./assets/abstract-factory.png)
+## The project runs by default
+1. Download Zookeeper from the official website: [download](https://zookeeper.apache.org/releases.html), download and decompress `zkServer.md` in the bin directory, double-click to run it, this project uses **3.7.1 version**, try to be consistent to avoid problems.
+2. Find the **demo-rpc-server** module in the project and run **Server**</br>
+![server](./assets/run-server.png)
+3. Find the **demo-rpc-client** module in the project, run **NettyClientMain**</br>
+![client](./assets/run-client.png)
+4. After running successfully, you can see:</br>
+![console-server](./assets/console-server.png)</br>
+![console-client](./assets/console-client.png)
 ---
-
-## 项目更改配置中心运行
-本项目使用了zookeeper和nacos作为配置中心，运行项目的时候只需要选择其中一种就行了，默认是zookeeper。
-- 第一步
-找到项目的demo-rpc-server和demo-rpc-client两个模块，分别修改其中的rpc.properties文件中的配置：
+## Project change registry run
+This project uses zookeeper and nacos as the configuration center. When running the project, you only need to choose one of them. The default is zookeeper.
+- first step, Find the `demo-rpc-server` and `demo-rpc-client` modules of the project, and modify the configurations in the rpc.properties file respectively:
 ```properties
 # rpc.zookeeper.address=127.0.0.1:2181
 rpc.nacos.address=127.0.0.1:8848
 ```
-- 第二步，启动项目
-启动zookeeper或者nacos，然后运行项目即可。
-
-- Server端效果</br>
-![img.png](assets/nacos-server.png)
-- Client端效果</br>
-![img.png](assets/nacos-client.png)
-
-
-## 项目更改负载均衡运行
-本项目只作为自己的学习项目，本人也在学习中，该项目参考的是别人的开源项目，大佬写的非常棒，目前处于学习中，后期会不断优化的。
+- The second step, start the project, Start zookeeper or nacos, and then run the project.
+- Server</br>
+  ![img.png](assets/nacos-server.png)
+- Client</br>
+  ![img.png](assets/nacos-client.png)
+## Project Change Load Balancer Run
+To be perfected. . .</br>
+This project is only used as my own learning project, and I am also learning. This project refers to other people's open source projects. The big guy wrote it very well. I am currently studying and will continue to optimize it later.
