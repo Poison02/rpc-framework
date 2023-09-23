@@ -34,7 +34,7 @@ rpc-framework
 
 0     1     2     3     4        5     6     7     8         9          10      11     12  13  14   15 16    -- 字节长度
 +-----+-----+-----+-----+--------+----+----+----+------+-----------+-------+----- --+-----+-----+-------+
-|   magic   code        |version | full length         | messageType| codec|compress|    requestId      |    -- 请求头
+|   magic   code        |version | full length         |messageType| codec |compress|    requestId      |    -- 请求头
 +-----------------------+--------+---------------------+-----------+-----------+-----------+------------+
 |                                                                                                       |
 |                                         body                                                          |    -- 请求体

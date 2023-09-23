@@ -34,7 +34,7 @@ Using a custom protocol, the protocol is as follows:
 
 0     1     2     3     4        5     6     7     8         9          10      11     12  13  14   15 16    -- byte length
 +-----+-----+-----+-----+--------+----+----+----+------+-----------+-------+----- --+-----+-----+-------+
-|   magic   code        |version | full length         | messageType| codec|compress|    requestId      |    -- request header
+|   magic   code        |version | full length         |messageType| codec |compress|    requestId      |    -- request header
 +-----------------------+--------+---------------------+-----------+-----------+-----------+------------+
 |                                                                                                       |
 |                                         body                                                          |    -- request body
